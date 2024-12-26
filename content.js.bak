@@ -1,0 +1,867 @@
+// Default keywords if none are stored
+const DEFAULT_KEYWORDS = [
+    'war', 'death', 'died', 'killed', 'murder', 'tragic', 'crisis', 'disaster', 
+    'crash', 'dead', 'fatal', 'victim', 'terror', 'attack', 'shooting', 'killed',
+    'accident', 'suicide', 'bomb', 'catastrophe', 'emergency', 'violence'
+];
+
+// Initialize keywords and process page
+let currentKeywords = [];
+
+// Listen for changes in storage
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'sync' && changes.blockedKeywords) {
+        currentKeywords = changes.blockedKeywords.newValue || DEFAULT_KEYWORDS;
+        processPage(currentKeywords);
+    }
+});
+
+// Get initial keywords and process page
+chrome.storage.sync.get(['blockedKeywords'], function(result) {
+    currentKeywords = result.blockedKeywords || DEFAULT_KEYWORDS;
+    processPage(currentKeywords);
+});
+
+// Function to process the page content
+function processPage(keywords) {
+    console.log('Processing page with keywords:', keywords);
+    const paragraphs = document.getElementsByTagName('p');
+    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    
+    // Check paragraphs and headings for negative keywords
+    for (const element of [...paragraphs, ...headings]) {
+        const text = element.textContent.toLowerCase();
+        if (keywords.some(keyword => text.includes(keyword.toLowerCase()))) {
+            replaceContent(element);
+        }
+    }
+}
+
+// List of negative keywords to filter
+var negativeKeywords = [
+    'putin', 'death', 'died', 'killed', 'murder', 'tragic', 'crisis', 'disaster', 'crash', 'jail',
+    'war', 'fatal', 'crash', 'accident', 'suicide', 'terror', 'attack', 'rape', 'raped',
+    'victim', 'violence', 'dead', 'emergency', 'catastrophe', 'tragedy', 'hospital', 'armed',
+    'villain', 'alarm', 'massacre', 'gunman', 'gunmen', 'trump', 'dies', 'politics', 
+    'scandal', 'alone', 'holy', 'russia', 'russian', 'syria', 'syrian', 'sinks', 'crashes', 'panic'
+];
+
+// Array of dad jokes for fallback content
+const DAD_JOKES = [
+    {
+        title: "What did the coffee report to the police?",
+        description: "A mugging!",
+        image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=300"
+    },
+    {
+        title: "Why don't eggs tell jokes?",
+        description: "They'd crack up!",
+        image: "https://images.unsplash.com/photo-1491524062933-cb0289261700?w=300"
+    },
+    {
+        title: "What do you call a fake noodle?",
+        description: "An impasta!",
+        image: "https://images.unsplash.com/photo-1551183053-b56c05c78a00?w=300"
+    },
+    {
+        title: "Why did the scarecrow win an award?",
+        description: "Because he was outstanding in his field!",
+        image: "https://images.unsplash.com/photo-1500076656116-8f76df5d1f2d?w=300"
+    },
+    {
+        title: "What do you call a bear with no teeth?",
+        description: "A gummy bear!",
+        image: "https://images.unsplash.com/photo-1581375321224-79da6fd32f6e?w=300"
+    },
+    {
+        title: "What did the grape say when it got stepped on?",
+        description: "Nothing, it just let out a little wine!",
+        image: "https://images.unsplash.com/photo-1596363505729-4190a9506133?w=300"
+    },
+    {
+        title: "What did the ocean say to the shore?",
+        description: "Nothing, it just waved!",
+        image: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300"
+    },
+    {
+        title: "Why don't scientists trust atoms?",
+        description: "Because they make up everything!",
+        image: "https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=300"
+    },
+    {
+        title: "What do you call a dinosaur that crashes his car?",
+        description: "Tyrannosaurus wrecks!",
+        image: "https://images.unsplash.com/photo-1570482606740-a0b0baa0e58d?w=300"
+    },
+    {
+        title: "What's orange and sounds like a parrot?",
+        description: "A carrot!",
+        image: "https://images.unsplash.com/photo-1582515073490-39981397c445?w=300"
+    },
+    {
+        title: "What did one wall say to the other wall?",
+        description: "I'll meet you at the corner!",
+        image: "https://images.unsplash.com/photo-1541233349642-6e425fe6190e?w=300"
+    },
+    {
+        title: "Why don't skeletons fight each other?",
+        description: "They don't have the guts!",
+        image: "https://images.unsplash.com/photo-1509557965875-b88c97052f0e?w=300"
+    },
+    {
+        title: "What did the drummer call his twin daughters?",
+        description: "Anna One, Anna Two!",
+        image: "https://images.unsplash.com/photo-1543443258-92b04ad5ec6b?w=300"
+    },
+    {
+        title: "Why did the math book look so sad?",
+        description: "Because it had too many problems!",
+        image: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=300"
+    },
+    {
+        title: "What do you call a fish wearing a bowtie?",
+        description: "So-fish-ticated!",
+        image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?w=300"
+    },
+    {
+        title: "What do you call a penguin in the desert?",
+        description: "Lost!",
+        image: "https://images.unsplash.com/photo-1598439210625-5067c578f3f6?w=300"
+    },
+    {
+        title: "What do you call a bear with no ears?",
+        description: "B!",
+        image: "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?w=300"
+    },
+    {
+        title: "Why don't oysters donate to charity?",
+        description: "Because they're shellfish!",
+        image: "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300"
+    },
+    {
+        title: "Why did the golfer bring two pairs of pants?",
+        description: "In case he got a hole in one!",
+        image: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=300"
+    },
+    {
+        title: "What do you call a pig that does karate?",
+        description: "A pork chop!",
+        image: "https://images.unsplash.com/photo-1604848698030-c434ba08ece1?w=300"
+    },
+    {
+        title: "Why can't a bicycle stand on its own?",
+        description: "It's two-tired!",
+        image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=300"
+    },
+    {
+        title: "What do you call a sleeping pizza?",
+        description: "A pizzzzza!",
+        image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300"
+    },
+    {
+        title: "What did the janitor say when he jumped out of the closet?",
+        description: "Supplies!",
+        image: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=300"
+    },
+    {
+        title: "What do you call a factory that makes okay products?",
+        description: "A satisfactory!",
+        image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=300"
+    },
+    {
+        title: "Why did the gym close down?",
+        description: "It just didn't work out!",
+        image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300"
+    },
+    {
+        title: "What do you call a pile of cats?",
+        description: "A meow-ntain!",
+        image: "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=300"
+    },
+    {
+        title: "Why don't ants get sick?",
+        description: "Because they have tiny ant-ibodies!",
+        image: "https://images.unsplash.com/photo-1596742578443-7682ef5251cd?w=300"
+    },
+    {
+        title: "What's brown and sticky?",
+        description: "A stick!",
+        image: "https://images.unsplash.com/photo-1578559284795-c9f77e5df1c9?w=300"
+    },
+    {
+        title: "Why don't melons get married?",
+        description: "They cantaloupe!",
+        image: "https://images.unsplash.com/photo-1563288525-8f1ee0f874a8?w=300"
+    },
+    {
+        title: "What did the buffalo say to his son when he left for college?",
+        description: "Bison!",
+        image: "https://images.unsplash.com/photo-1581593201891-8f76df5d1f1c?w=300"
+    },
+    {
+        title: "What do you call a fish wearing a crown?",
+        description: "King salmon!",
+        image: "https://images.unsplash.com/photo-1511087513950-559421183640?w=300"
+    },
+    {
+        title: "What do you call a duck that gets all A's?",
+        description: "A wise quacker!",
+        image: "https://images.unsplash.com/photo-1465153690352-10c1b29577f8?w=300"
+    },
+    {
+        title: "What did the stamp say to the envelope?",
+        description: "I'm stuck on you!",
+        image: "https://images.unsplash.com/photo-1579412690850-bd41cd0af397?w=300"
+    },
+    {
+        title: "What do you call a bear taking a nap?",
+        description: "A nap-kin!",
+        image: "https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=300"
+    },
+    {
+        title: "What did one plate say to another?",
+        description: "Dinner's on me!",
+        image: "https://images.unsplash.com/photo-1587583484084-8f9f59e39600?w=300"
+    },
+    {
+        title: "What kind of tree fits in your hand?",
+        description: "A palm tree!",
+        image: "https://images.unsplash.com/photo-1515542706656-8e6ef17a1521?w=300"
+    },
+    {
+        title: "Why did the cookie go to therapy?",
+        description: "It was feeling crumbly!",
+        image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=300"
+    },
+    {
+        title: "What's a vampire's favorite fruit?",
+        description: "A blood orange!",
+        image: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=300"
+    },
+    {
+        title: "Why did the jellybean go to school?",
+        description: "To become a smartie!",
+        image: "https://images.unsplash.com/photo-1581798459219-318e76aecc7b?w=300"
+    },
+    {
+        title: "What do you call a sheep with no legs?",
+        description: "A cloud!",
+        image: "https://images.unsplash.com/photo-1533167649158-6d508895b680?w=300"
+    },
+    {
+        title: "What do you call a dog magician?",
+        description: "A labracadabrador!",
+        image: "https://images.unsplash.com/photo-1534351450181-ea9f78427fe8?w=300"
+    },
+    {
+        title: "What did the calculator say to the math student?",
+        description: "You can count on me!",
+        image: "https://images.unsplash.com/photo-1574607383476-f517f260d30b?w=300"
+    },
+    {
+        title: "Why did the music note get in trouble?",
+        description: "Because it was being too sharp!",
+        image: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300"
+    },
+    {
+        title: "What do you call a snowman with a six-pack?",
+        description: "An abdominal snowman!",
+        image: "https://images.unsplash.com/photo-1607251090800-c2c4a6e09661?w=300"
+    },
+    {
+        title: "Why don't phones ever go hungry?",
+        description: "They have plenty of bytes!",
+        image: "https://images.unsplash.com/photo-1511707171634-bd41cd0af397?w=300"
+    },
+    {
+        title: "What do you call a bee that can't make up its mind?",
+        description: "A maybe!",
+        image: "https://images.unsplash.com/photo-1560806175-3b5e66f4c7e7?w=300"
+    }
+];
+
+let blogPosts = [];
+let currentPostIndex = 0;
+let timeoutId = null;
+let blogPostsLoaded = false;
+let usedPosts = new Set();  // Track which posts we've used
+let usedJokes = new Set();
+
+function initializeBlogPosts(posts) {
+    console.log('Initializing blog posts:', posts);
+    blogPosts = posts;
+    currentPostIndex = 0;
+    blogPostsLoaded = true;
+    usedPosts.clear();  // Reset used posts tracking
+    
+    // Now that we have posts, check articles
+    checkArticles();
+}
+
+function fetchBlogPosts() {
+    console.log('Content: Requesting RSS feed from background...');
+    chrome.runtime.sendMessage({action: "fetchRSSFeed"}, response => {
+        if (response.success) {
+            try {
+                console.log('Content: Received RSS data, parsing XML...');
+                
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(response.data, 'text/xml');
+                
+                // Check if parsing was successful
+                const parserError = xmlDoc.querySelector('parsererror');
+                if (parserError) {
+                    console.error('Content: XML parsing error:', parserError.textContent);
+                    throw new Error('XML parsing error: ' + parserError.textContent);
+                }
+
+                const items = xmlDoc.getElementsByTagName('item');
+                console.log('Content: Found', items.length, 'items in feed');
+                
+                if (!items || items.length === 0) {
+                    throw new Error('No items found in feed');
+                }
+
+                // Process each RSS item
+                const newPosts = [];
+                for (let i = 0; i < Math.min(items.length, 10); i++) {
+                    const item = items[i];
+                    
+                    // Get all the elements we need
+                    const titleElem = item.getElementsByTagName('title')[0];
+                    const linkElem = item.getElementsByTagName('link')[0];
+                    const contentElem = item.getElementsByTagNameNS('http://purl.org/rss/1.0/modules/content/', 'encoded')[0];
+                    const descElem = item.getElementsByTagName('description')[0];
+                    
+                    // Create temporary element to parse HTML content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = (contentElem || descElem)?.textContent || '';
+                    
+                    // Find first image
+                    const firstImage = tempDiv.querySelector('img');
+                    const imageUrl = firstImage ? firstImage.src : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=300&q=80';
+                    
+                    // Get description
+                    const description = descElem?.textContent || '';
+                    tempDiv.innerHTML = description;
+                    const cleanDescription = tempDiv.textContent.trim();
+                    
+                    // Create post object
+                    const post = {
+                        title: titleElem?.textContent.trim() || 'Untitled',
+                        link: linkElem?.textContent.trim() || 'https://blog.supermarketwizard.com',
+                        description: cleanDescription.substring(0, 200) + '...',
+                        image: imageUrl
+                    };
+                    
+                    console.log('Created post object:', post);
+                    newPosts.push(post);
+                }
+
+                console.log('Content: Successfully loaded ' + newPosts.length + ' blog posts');
+                
+                // Initialize blog posts with the new posts
+                initializeBlogPosts(newPosts);
+                
+            } catch (e) {
+                console.error('Content: Error processing RSS feed:', e);
+                useFallbackPosts();
+                checkArticles();
+            }
+        } else {
+            console.error('Content: Error fetching RSS feed:', response.error);
+            useFallbackPosts();
+            checkArticles();
+        }
+    });
+}
+
+function getNextBlogPost() {
+    // If we have no posts, use fallback
+    if (!blogPosts || blogPosts.length === 0) {
+        console.log('No blog posts available, using fallback');
+        return getFallbackPost();
+    }
+    
+    // If we've used all posts, reset tracking
+    if (usedPosts.size >= blogPosts.length) {
+        console.log('All posts used, resetting tracker');
+        usedPosts.clear();
+    }
+    
+    // Find the next unused post
+    let startIndex = currentPostIndex;
+    let attempts = 0;
+    
+    while (attempts < blogPosts.length) {
+        if (!usedPosts.has(currentPostIndex)) {
+            break;
+        }
+        currentPostIndex = (currentPostIndex + 1) % blogPosts.length;
+        attempts++;
+    }
+    
+    // Get current post
+    const post = blogPosts[currentPostIndex];
+    const displayIndex = currentPostIndex + 1;
+    
+    console.log('Post selection:', {
+        totalPosts: blogPosts.length,
+        currentIndex: currentPostIndex,
+        displayIndex: displayIndex,
+        usedPosts: Array.from(usedPosts),
+        selectedTitle: post.title
+    });
+    
+    // Mark post as used
+    usedPosts.add(currentPostIndex);
+    
+    // Increment index for next time
+    currentPostIndex = (currentPostIndex + 1) % blogPosts.length;
+    
+    return {
+        ...post,
+        title: `${post.title} (${displayIndex}/${blogPosts.length})`
+    };
+}
+
+function getFallbackPost() {
+    // Reset used jokes if we've used them all
+    if (usedJokes.size >= DAD_JOKES.length) {
+        usedJokes.clear();
+    }
+    
+    // Find an unused joke
+    let availableJokes = DAD_JOKES.filter((_, index) => !usedJokes.has(index));
+    let randomIndex = Math.floor(Math.random() * availableJokes.length);
+    let joke = availableJokes[randomIndex];
+    
+    // Mark this joke as used
+    usedJokes.add(DAD_JOKES.indexOf(joke));
+    
+    return {
+        title: joke.title,
+        link: "#",
+        description: joke.description,
+        image: joke.image
+    };
+}
+
+function useFallbackPosts() {
+    console.log('Using fallback posts - clearing blog posts array');
+    blogPosts = [];
+    currentPostIndex = 0;
+}
+
+function isDarkMode() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function getThemeColors() {
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
+        cardBg: isDark ? '#2d2d2d' : '#ffffff',
+        border: isDark ? '#404040' : '#e5e5e5',
+        title: isDark ? '#ffffff' : '#1a1a1a',
+        text: isDark ? '#e0e0e0' : '#4a4a4a',
+        subtext: isDark ? '#a0a0a0' : '#666666'
+    };
+}
+
+function hideArticle(element) {
+    try {
+        const colors = getThemeColors();
+        
+        // Get post before creating any elements to ensure consistent cycling
+        const post = getNextBlogPost();
+        console.log('Replacing article with blog post:', post.title);
+        
+        if (!post) {
+            console.error('No post available for replacement');
+            return;
+        }
+        
+        // Create wrapper div
+        const wrapper = document.createElement('div');
+        wrapper.className = 'positive-news-replacement';
+        wrapper.setAttribute('data-post-index', currentPostIndex);  // Track which post was used
+        
+        // Create article content
+        const article = document.createElement('article');
+        article.className = 'blog-post-article';
+        
+        // Style the wrapper with theme colors
+        wrapper.style.cssText = `
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid ${colors.border};
+            border-radius: 8px;
+            background-color: ${colors.cardBg};
+            max-width: 300px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        `;
+        
+        // Create image container
+        const imgContainer = document.createElement('div');
+        imgContainer.style.cssText = `
+            margin-bottom: 15px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            padding-bottom: 75%;
+            background: ${colors.border};
+        `;
+        
+        // Create and set image
+        const img = document.createElement('img');
+        img.src = post.image;
+        img.alt = post.title;
+        img.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        `;
+        imgContainer.appendChild(img);
+        
+        // Create title/link
+        const titleContainer = document.createElement('div');
+        titleContainer.style.cssText = `
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            line-height: 1.4;
+            overflow: hidden;
+        `;
+        
+        const link = document.createElement('a');
+        link.href = post.link;
+        link.textContent = post.title;
+        link.target = '_blank';
+        link.style.cssText = `
+            text-decoration: none;
+            color: ${colors.title};
+            display: block;
+            margin-bottom: 8px;
+        `;
+        
+        titleContainer.appendChild(link);
+        
+        // Create description
+        const description = document.createElement('div');
+        description.textContent = post.description;
+        description.style.cssText = `
+            color: ${colors.text};
+            line-height: 1.5;
+            margin-bottom: 12px;
+            font-size: 13px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        `;
+        
+        // Assemble article
+        article.appendChild(imgContainer);
+        article.appendChild(titleContainer);
+        article.appendChild(description);
+        wrapper.appendChild(article);
+        
+        // Replace the original element
+        element.style.display = 'none';
+        element.insertAdjacentElement('afterend', wrapper);
+        
+    } catch (e) {
+        console.error('Error replacing article:', e);
+    }
+}
+
+function getElementText(element) {
+    // Try to get text from specific elements first
+    const textElements = [
+        // BBC News specific selectors
+        ...Array.from(element.querySelectorAll('.gs-c-promo-heading')),  // BBC headlines
+        ...Array.from(element.querySelectorAll('.gs-c-promo-summary')),  // BBC summaries
+        ...Array.from(element.querySelectorAll('.gs-c-promo-body')),     // BBC body text
+        
+        // Sky News specific selectors
+        ...Array.from(element.querySelectorAll('.sdc-site-tile__headline')),  // Sky headlines
+        ...Array.from(element.querySelectorAll('.sdc-site-tile__summary')),   // Sky summaries
+        ...Array.from(element.querySelectorAll('.sdc-site-tile__body')),      // Sky body text
+        
+        // Generic article selectors
+        ...Array.from(element.querySelectorAll('h1, h2, h3')),          // Headlines
+        ...Array.from(element.querySelectorAll('p')),                    // Paragraphs
+        ...Array.from(element.querySelectorAll('.headline, .title')),    // Common headline classes
+        ...Array.from(element.querySelectorAll('.summary, .description')) // Common summary classes
+    ];
+    
+    // Get text from all found elements
+    const texts = textElements.map(el => el.textContent.trim()).filter(text => text.length > 0);
+    
+    // If we found specific text elements, use those
+    if (texts.length > 0) {
+        return texts.join(' ');
+    }
+    
+    // Fallback to general text content
+    return element.textContent.trim();
+}
+
+function checkArticles() {
+    console.log('Starting article check. Available blog posts:', blogPosts.length);
+    
+    try {
+        // BBC News specific elements
+        const bbcElements = [
+            ...Array.from(document.querySelectorAll('.gs-c-promo')),
+            ...Array.from(document.querySelectorAll('.gs-c-promo-body'))
+        ];
+        
+        // Sky News specific elements
+        const skyElements = [
+            ...Array.from(document.querySelectorAll('.sdc-site-tile')),
+            ...Array.from(document.querySelectorAll('.sdc-site-tile__body'))
+        ];
+        
+        // Generic article elements
+        const genericElements = [
+            ...Array.from(document.querySelectorAll('article')),
+            ...Array.from(document.querySelectorAll('.article, .story, .news-item'))
+        ];
+        
+        // Combine all elements
+        const allElements = [...bbcElements, ...skyElements, ...genericElements];
+        
+        console.log('Found elements:', {
+            bbc: bbcElements.length,
+            sky: skyElements.length,
+            generic: genericElements.length,
+            total: allElements.length
+        });
+        
+        // Check each element
+        let replacedCount = 0;
+        allElements.forEach((element, index) => {
+            try {
+                // Skip if already processed or if element was removed
+                if (!element || !element.parentNode || element.getAttribute('data-processed')) {
+                    return;
+                }
+                
+                // Skip if blocked by ad blocker
+                if (element.style.display === 'none' || element.style.visibility === 'hidden') {
+                    return;
+                }
+                
+                // Get text content using our improved function
+                const elementText = getElementText(element);
+                
+                // Skip if no meaningful text found
+                if (!elementText || elementText.length < 10) {
+                    return;
+                }
+                
+                // Check for negative content
+                if (hasNegativeWord(elementText)) {
+                    hideArticle(element);
+                    element.setAttribute('data-processed', 'true');
+                    replacedCount++;
+                }
+            } catch (elementError) {
+                console.error('Error processing element:', elementError);
+            }
+        });
+        
+        console.log('Replaced', replacedCount, 'negative articles');
+        
+    } catch (e) {
+        console.error('Error checking articles:', e);
+    }
+}
+
+function replacePolitics() {
+    var links = document.getElementsByTagName('a');
+    var colors = getThemeColors();
+    
+    for (var i = 0; i < links.length; i++) {
+        var text = links[i].textContent || '';
+        var href = links[i].href || '';
+        
+        if (text.toLowerCase().indexOf('politics') !== -1 || 
+            href.toLowerCase().indexOf('politics') !== -1) {
+            
+            var newLink = document.createElement('a');
+            newLink.href = 'https://blog.supermarketwizard.com';
+            newLink.innerHTML = '<span style="display: flex; align-items: center; gap: 4px;"><span>Supermarket Wizard Blog</span><span style="font-size: 14px;">🛒</span></span>';
+            newLink.target = '_blank';
+            newLink.style.color = colors.title;
+            newLink.style.textDecoration = 'none';
+            
+            if (links[i].className) {
+                newLink.className = links[i].className;
+            }
+            
+            links[i].parentNode.replaceChild(newLink, links[i]);
+            break;
+        }
+    }
+}
+
+function debugBlogPosts() {
+    console.log('Current blog posts:', blogPosts);
+    console.log('Current post index:', currentPostIndex);
+}
+
+function onContentChange() {
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+        if (blogPostsLoaded) {
+            checkArticles();
+        }
+    }, 500);
+}
+
+const observer = new MutationObserver(onContentChange);
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+darkModeMediaQuery.addListener(() => {
+    if (blogPostsLoaded) {
+        checkArticles();
+    }
+});
+
+function hasNegativeWord(text) {
+    if (!text) return false;
+    text = text.toLowerCase();
+    for (var i = 0; i < negativeKeywords.length; i++) {
+        const keyword = negativeKeywords[i];
+        if (text.includes(keyword)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function createStyledElement(type, content = '', styles = {}) {
+    const element = document.createElement(type);
+    if (content) {
+        element.textContent = content;
+    }
+    Object.assign(element.style, styles);
+    return element;
+}
+
+function createContentContainer(title, description, image, source) {
+    const container = createStyledElement('div', '', {
+        padding: '15px',
+        background: '#f8f9fa',
+        borderRadius: '8px',
+        margin: '10px 0'
+    });
+
+    // Create and append title
+    const titleElement = createStyledElement('h3', title, {
+        color: '#2c3e50',
+        marginBottom: '10px'
+    });
+    container.appendChild(titleElement);
+
+    // Create and append image
+    const imgElement = document.createElement('img');
+    imgElement.src = image;
+    imgElement.alt = title;
+    Object.assign(imgElement.style, {
+        maxWidth: '300px',
+        borderRadius: '4px',
+        margin: '10px 0'
+    });
+    container.appendChild(imgElement);
+
+    // Create and append description
+    const descElement = createStyledElement('p', description, {
+        color: '#34495e'
+    });
+    container.appendChild(descElement);
+
+    // Create and append source
+    const sourceElement = createStyledElement('small', source, {
+        color: '#7f8c8d'
+    });
+    container.appendChild(sourceElement);
+
+    return container;
+}
+
+async function replaceContent(element) {
+    try {
+        // Try to get a blog post first
+        const response = await chrome.runtime.sendMessage({ action: 'getBlogPost' });
+        
+        // Clear existing content
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+
+        if (response.success && response.post) {
+            // Use the blog post
+            const container = createContentContainer(
+                response.post.title,
+                response.post.description,
+                response.post.image,
+                'From SupermarketWizard\'s Blog'
+            );
+            element.appendChild(container);
+        } else {
+            // Use a dad joke as fallback
+            const joke = getRandomDadJoke();
+            const container = createContentContainer(
+                joke.title,
+                joke.description,
+                joke.image,
+                'Dad Joke of the Day'
+            );
+            element.appendChild(container);
+        }
+    } catch (error) {
+        console.error('Error replacing content:', error);
+        // Always have a fallback
+        const joke = getRandomDadJoke();
+        const container = createContentContainer(
+            joke.title,
+            joke.description,
+            joke.image,
+            'Dad Joke of the Day'
+        );
+        element.appendChild(container);
+    }
+}
+
+function getRandomDadJoke() {
+    // Get a random index, but don't repeat until all jokes have been used
+    if (!window.usedJokeIndices) {
+        window.usedJokeIndices = new Set();
+    }
+    
+    if (window.usedJokeIndices.size >= DAD_JOKES.length) {
+        window.usedJokeIndices.clear();
+    }
+    
+    let index;
+    do {
+        index = Math.floor(Math.random() * DAD_JOKES.length);
+    } while (window.usedJokeIndices.has(index));
+    
+    window.usedJokeIndices.add(index);
+    return DAD_JOKES[index];
+}
+
+fetchBlogPosts();
