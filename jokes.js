@@ -118,7 +118,7 @@ const newDadJokes = [
     {
         title: "What did the janitor say when he jumped out of the closet?",
         description: "Supplies!",
-        image: "https://images.unsplash.com/photo-1603666413723-fd8b35bb0b8d?w=300"
+        image: "https://images.unsplash.com/photo-1584992236310-6ded3f94f461?w=300"
     },
     {
         title: "Why don't skeletons fight each other?",
@@ -150,7 +150,21 @@ const newDadJokes = [
         description: "A gummy bear!",
         image: "https://images.unsplash.com/photo-1590418606746-018840f9cd0f?w=300"
     },
-    // Continue with more jokes...
+    {
+        title: "What did the janitor say when he jumped out of the closet?",
+        description: "Supplies!",
+        image: "https://images.unsplash.com/photo-1584992236310-6ded3f94f461?w=300"
+    },
+    {
+        title: "What do you call a fish wearing a crown?",
+        description: "A king salmon!",
+        image: "https://images.unsplash.com/photo-1544465544-1b71aee9dfa3?w=300"
+    },
+    {
+        title: "Why don't programmers like nature?",
+        description: "It has too many bugs!",
+        image: "https://images.unsplash.com/photo-1542831371-32f555c86880?w=300"
+    }
 ];
 
 // Export the jokes

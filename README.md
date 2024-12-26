@@ -1,13 +1,11 @@
 # Negative News Chrome Extension Blocker
 
-This Chrome extension filters out negative or sad articles from popular news websites. It helps create a more positive browsing experience by hiding articles that contain negative keywords.
+A Chrome extension that transforms your news browsing experience by filtering out negative content, blocking ads, and replacing them with uplifting content. It helps create a more positive browsing experience by hiding negative articles and replacing them with dad jokes and motivational quotes.
 
 ## Features
 
+### Content Filtering
 - Automatically hides articles containing negative keywords
-- Works on major news websites
-- Shows a brief notification when active
-- Updates dynamically as you scroll or new content loads
 - Customizable keyword filtering by categories:
   - Violence (e.g., murder, attack, terror)
   - Death (e.g., died, fatal)
@@ -18,8 +16,33 @@ This Chrome extension filters out negative or sad articles from popular news web
 - Enable/disable specific keyword categories
 - Add custom keywords to any category
 - Manage list of filtered news domains
+
+### Ad Blocking
+- Blocks common ad networks (DoubleClick, Google Ads, Outbrain, Taboola)
+- Filters based on EasyList and EasyPrivacy lists
+- Smart whitelist for essential content
+- Cosmetic filtering for ad-related elements
+- Preserves website functionality while removing ads
+
+### Content Replacement
+- Replaces negative content with:
+  - Dad jokes with images
+  - Motivational quotes categorized by:
+    - Personal Development
+    - Career Success
+    - Relationships
+    - Health & Wellness
+    - Leadership
+- Dynamic content rotation
+- Mood-based quote selection
+- Visual enhancement with relevant images
+
+### User Interface
+- Shows a brief notification when active
+- Updates dynamically as you scroll
 - Option to temporarily disable filtering
 - Dark/Light mode support
+- Easy-to-use options page
 
 ## Installation
 
@@ -28,13 +51,7 @@ This Chrome extension filters out negative or sad articles from popular news web
 3. Click "Load unpacked" and select the extension directory
 4. The extension will automatically start working when you visit supported news websites
 
-## How it Works
-
-The extension scans article headlines for negative keywords and hides articles that contain these words. It works continuously as you browse, filtering both initial content and dynamically loaded articles. Users can customize their experience through the options page, including managing keyword categories and news domains.
-
 ## Supported Websites
-
-The extension works on major news websites including:
 
 ### Primary Support
 - BBC News (bbc.com, bbc.co.uk)
@@ -63,11 +80,21 @@ The extension offers several ways to customize your experience:
 1. **Keyword Categories**: Enable or disable entire categories of keywords
 2. **Custom Keywords**: Add your own keywords to any category
 3. **Domain Management**: Add or remove news websites from the filter
-4. **Filter Toggle**: Quickly enable/disable the extension through the popup
+4. **Content Preferences**: Choose between jokes, quotes, or both for replacements
+5. **Ad Blocking**: Configure whitelist and filter rules
+6. **Filter Toggle**: Quickly enable/disable any feature through the popup
+
+## Privacy & Security
+
+- No user data collection
+- All processing happens locally in your browser
+- Filter lists are downloaded from trusted sources
+- Whitelist system for essential website functionality
+- Regular updates to filter rules
 
 ## Version
 
-1.1.0 - Added customizable settings and dark mode support
+1.1.0 - Added ad blocking and content replacement features
 
 ## License
 
