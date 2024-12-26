@@ -1,4 +1,4 @@
-# Negative News Chrome Extension Blocker
+# Negative News Block for Chrome
 
 A Chrome extension that transforms your news browsing experience by filtering out negative content, blocking ads, and replacing them with uplifting content. It helps create a more positive browsing experience by hiding negative articles and replacing them with dad jokes and motivational quotes.
 
