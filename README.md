@@ -1,5 +1,7 @@
 # Negative News Block for Chrome
 
+![111111](https://github.com/user-attachments/assets/5d73d6fd-4f24-4123-9361-9fb4eca42696)
+
 A Chrome extension that transforms your news browsing experience by filtering out negative content, blocking ads, and replacing them with uplifting content. It helps create a more positive browsing experience by hiding negative articles and replacing them with dad jokes and motivational quotes.
 
 ## Features
@@ -54,6 +56,7 @@ A Chrome extension that transforms your news browsing experience by filtering ou
 ## Supported Websites
 
 ### Primary Support
+
 - BBC News (bbc.com, bbc.co.uk)
 - Sky News (news.sky.com)
 - The Guardian (theguardian.com)
